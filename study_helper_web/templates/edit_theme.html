@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Edit {{theme.name}}{% endblock %}
+
+{% block content %}
+    <form method="POST">
+        {% for question in theme.questions %}
+            <li class="list-group-item list-group-item-action">
+                {{question.question}} / {{question.answer}}  ({{question.correct_cnt}} / {{question.incorrect_cnt}})
+                <button type="submit" class="close" name="deleteQuestion" value="{{question.id}}">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </li>
+        {% endfor %}
+    </form>
+    <form method="POST">
+        <label for="newQuestion">New question</label>
+        <input class="form-control form-control-lg" type="text" name="newQuestion" id="newQuestion"
+               placeholder="Enter new question" autocomplete="off">
+        <label for="answer">Answer</label>
+        <input class="form-control form-control-lg" type="text" name="answer" id="answer"
+               placeholder="Enter answer" autocomplete="off">
+        <br/>
+        <button type="submit" class="btn btn-primary">Add</button>
+    </form>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+    {% if user.is_authenticated %}
+        <ul class="list-group">
+            {% for theme in user.themes %}
+                <li class="list-group-item list-group-item-action">
+                    <a href="/practice/{{theme.name}}" class="link-dark">{{theme.name}}</a>
+                    <form method="POST">
+                        <button type="submit" class="btn btn-outline-primary pull-right" name="themeToEdit" value="{{theme.name}}">Edit</button>
+                    </form>
+                    <form method="POST">
+                        <button type="submit" class="btn btn-outline-danger pull-right" name="themeToDelete" value="{{theme.name}}">Delete</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+        <form method="POST">
+            <label for="themeName">New theme</label>
+            <input class="form-control form-control-lg" type="text" name="themeName" id="themeName" placeholder="Enter theme name">
+            <br/>
+            <button type="submit" class="btn btn-primary">Create</button>
+        </form>
+    {% endif %}
+{% endblock %}

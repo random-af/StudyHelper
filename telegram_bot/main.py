@@ -143,7 +143,7 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 def main():
-    application = Application.builder().token("5982143169:AAExh6WNAWuMoFO8fMHeEGSZN88L8BiUf-Y").build()
+    application = Application.builder().token("").build()
     # ubrat token v env variable !!!!!!!!!!!!!!!!!!!!
 
     # dobavit' logger !!!!!!!!!!!!!!!!!!

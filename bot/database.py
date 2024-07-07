@@ -25,12 +25,14 @@ from sqlalchemy.ext.asyncio import create_async_engine
 
 from pydantic import PostgresDsn
 
+import config
+
 
 #DATABASE_URL = str(PostgresDsn)
 #todo: add config and move all constants there
 
 #todo: choose suitable engine
-engine = create_async_engine("postgresql+asyncpg://", echo=True)
+engine = create_async_engine(config.DB_URI, echo=True)
 
 metadata = MetaData()
 
@@ -52,14 +54,24 @@ users_tg = Table(
     Column("first_name", String, nullable=False),
     Column("last_name", String),
     Column("is_premium", Boolean),
+    Column("language_code", String),
     Column("created_at", DateTime, server_default=func.now(), nullable=False),
     Column("updated_at", DateTime, server_default=func.now(), onupdate=func.now()),
 )
 
+user_settings = Table(
+    "user_settings",
+    metadata,
+    Column("id", Integer, Identity(), primary_key=True),
+    Column("language", String, nullable=False),
+    Column("mode", String, nullable=False),
+)
+
 async def fetch_one(select_query: Select | Insert | Update) -> dict[str, Any] | None:
     async with engine.begin() as conn:
-        cursor: CursorResult = await conn.execute(select_query) 
-        return cursor.first()._asdict() if cursor is not None else None
+        cursor: CursorResult = await conn.execute(select_query)
+        res = cursor.first()
+        return res._asdict() if res is not None else None
 
 
 async def fetch_all(select_query: Select | Insert | Update) -> list[dict[str, Any]]:
@@ -68,13 +80,8 @@ async def fetch_all(select_query: Select | Insert | Update) -> list[dict[str, An
         return [r._asdict() for r in cursor.all()]
 
 
-async def execute(select_query: Insert | Update) -> CursorResult:
+async def execute(query: Insert | Update) -> CursorResult:
     async with engine.begin() as conn:
-        return await conn.execute(select_query)
-    
-
-async def start_db_tmp():
-    #перенести создание в докерфайл!!!
-    async with engine.begin() as conn:
-        await conn.run_sync(metadata.drop_all)
-        await conn.run_sync(metadata.create_all)
+        res = await conn.execute(query)
+        await conn.commit()
+        return res

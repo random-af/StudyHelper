@@ -27,7 +27,8 @@ async def get_or_create_user(update: Update):
                  "language_code": effective_user.language_code}
     user = await get_user(user_dict["id"])
     if user is None:
-        user = await create_or_update_user(user_dict)
+        await create_or_update_user(user_dict)
+        user = await get_user(user_dict["id"])
         statement = insert(user_settings)\
             .values({"id": effective_user.id, "language": config.LANGUAGES[0], "mode": config.MODES[0]})
         await execute(statement)
@@ -42,4 +43,4 @@ async def create_or_update_user(user_dict: dict):
                 index_elements=(users_tg.c.id,),
                 set_=user_dict,
             )
-    await execute(statement)
+    return await execute(statement)
